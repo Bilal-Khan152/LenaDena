@@ -4,19 +4,32 @@ import type { Entry, EntryKind, PersonWithBalance } from "./types";
 // Everything lives in one small file on the phone: lenadena.db
 // No account, no server. Delete the app, the data is gone —
 // that privacy is the whole point of LenaDena.
+//
+// The database opens LAZILY, on the first real query — never when
+// this file is merely loaded. Startup can therefore never hang or
+// crash on database work, and by the time any screen asks for
+// data, the tables are guaranteed to exist (getDb creates them
+// before returning). Each CREATE runs as its own statement:
+// some expo-sqlite versions quietly skip later statements in one
+// big multi-statement string, which is how you can end up with a
+// people table but no entries table.
 
-const db = SQLite.openDatabaseSync("lenadena.db");
+let _db: SQLite.SQLiteDatabase | null = null;
 
-export function initDb() {
-  db.execSync(`
-    CREATE TABLE IF NOT EXISTS people (
+function getDb(): SQLite.SQLiteDatabase {
+  if (_db) return _db;
+  const db = SQLite.openDatabaseSync("lenadena.db");
+  db.execSync(
+    `CREATE TABLE IF NOT EXISTS people (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
       phone TEXT,
       note TEXT,
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
-    );
-    CREATE TABLE IF NOT EXISTS entries (
+    )`
+  );
+  db.execSync(
+    `CREATE TABLE IF NOT EXISTS entries (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       person_id INTEGER NOT NULL REFERENCES people(id) ON DELETE CASCADE,
       kind TEXT NOT NULL CHECK (kind IN ('gave', 'took', 'settled')),
@@ -25,28 +38,32 @@ export function initDb() {
       note TEXT,
       entry_date TEXT NOT NULL,
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
-    );
-    CREATE INDEX IF NOT EXISTS idx_entries_person ON entries(person_id);
-  `);
+    )`
+  );
+  db.execSync(
+    `CREATE INDEX IF NOT EXISTS idx_entries_person ON entries(person_id)`
+  );
+  _db = db;
+  return _db;
+}
+
+// Kept for the root layout: calling this early is harmless,
+// the real guarantee is that every function below goes
+// through getDb() first.
+export function initDb() {
+  getDb();
 }
 
 export function addPerson(name: string, phone?: string, note?: string): number {
-  const result = db.runSync(
+  const result = getDb().runSync(
     "INSERT INTO people (name, phone, note) VALUES (?, ?, ?)",
     [name.trim(), phone?.trim() || null, note?.trim() || null]
   );
   return Number(result.lastInsertRowId);
 }
 
-// Create the tables right now, the moment this file is first used.
-// Do NOT wait for a screen effect to call initDb(): child screens
-// render (and query) before the root layout's effect runs, and a
-// query against a table that does not exist yet crashes the app
-// with "no such table". This runs once and is safe to repeat.
-initDb();
-
 export function getPeopleWithBalances(): PersonWithBalance[] {
-  const rows = db.getAllSync<any>(
+  const rows = getDb().getAllSync<any>(
     `SELECT p.id, p.name, p.phone, p.note, p.created_at AS createdAt,
        COALESCE(SUM(e.signed_amount), 0) AS balance,
        COUNT(e.id) AS entryCount,
@@ -66,7 +83,7 @@ export function getPerson(id: number): PersonWithBalance | null {
 }
 
 export function getEntriesForPerson(personId: number): Entry[] {
-  const rows = db.getAllSync<any>(
+  const rows = getDb().getAllSync<any>(
     `SELECT id, person_id AS personId, kind, amount, signed_amount AS signedAmount,
             note, entry_date AS entryDate, created_at AS createdAt
      FROM entries WHERE person_id = ?
@@ -81,7 +98,7 @@ export function getEntriesForPerson(personId: number): Entry[] {
 }
 
 export function getBalance(personId: number): number {
-  const row = db.getFirstSync<{ balance: number }>(
+  const row = getDb().getFirstSync<{ balance: number }>(
     "SELECT COALESCE(SUM(signed_amount), 0) AS balance FROM entries WHERE person_id = ?",
     [personId]
   );
@@ -96,7 +113,7 @@ export function addEntry(
   entryDate: string
 ) {
   const signed = kind === "gave" ? amount : -amount;
-  db.runSync(
+  getDb().runSync(
     `INSERT INTO entries (person_id, kind, amount, signed_amount, note, entry_date)
      VALUES (?, ?, ?, ?, ?, ?)`,
     [personId, kind, amount, signed, note?.trim() || null, entryDate]
@@ -109,7 +126,7 @@ export function settleUp(personId: number) {
   const balance = getBalance(personId);
   if (balance === 0) return;
   const today = new Date().toISOString().slice(0, 10);
-  db.runSync(
+  getDb().runSync(
     `INSERT INTO entries (person_id, kind, amount, signed_amount, note, entry_date)
      VALUES (?, 'settled', ?, ?, 'Settled up', ?)`,
     [personId, Math.abs(balance), -balance, today]
@@ -124,7 +141,7 @@ export function getOldestOpenEntry(): {
   entryDate: string;
   amount: number;
 } | null {
-  const row = db.getFirstSync<any>(
+  const row = getDb().getFirstSync<any>(
     `SELECT e.person_id AS personId, p.name AS personName,
             e.entry_date AS entryDate, e.amount
      FROM entries e JOIN people p ON p.id = e.person_id
