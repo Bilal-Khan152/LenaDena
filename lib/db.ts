@@ -38,6 +38,13 @@ export function addPerson(name: string, phone?: string, note?: string): number {
   return Number(result.lastInsertRowId);
 }
 
+// Create the tables right now, the moment this file is first used.
+// Do NOT wait for a screen effect to call initDb(): child screens
+// render (and query) before the root layout's effect runs, and a
+// query against a table that does not exist yet crashes the app
+// with "no such table". This runs once and is safe to repeat.
+initDb();
+
 export function getPeopleWithBalances(): PersonWithBalance[] {
   const rows = db.getAllSync<any>(
     `SELECT p.id, p.name, p.phone, p.note, p.created_at AS createdAt,

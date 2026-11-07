@@ -13,18 +13,21 @@ import type { PersonWithBalance } from "../lib/types";
 export default function HomeScreen() {
   const router = useRouter();
   const [people, setPeople] = useState<PersonWithBalance[]>([]);
+  const [oldestOpen, setOldestOpen] = useState<ReturnType<typeof getOldestOpenEntry>>(null);
 
   // Reload every time the screen comes back into view.
   // Add a person, come back — the list is already right.
+  // All database reads live here, never during render.
   useFocusEffect(
     useCallback(() => {
       setPeople(getPeopleWithBalances());
+      setOldestOpen(getOldestOpenEntry());
     }, [])
   );
 
   const toGet = people.reduce((s, p) => s + (p.balance > 0 ? p.balance : 0), 0);
   const toGive = people.reduce((s, p) => s + (p.balance < 0 ? -p.balance : 0), 0);
-  const step = getNextStep(people, getOldestOpenEntry());
+  const step = getNextStep(people, oldestOpen);
 
   return (
     <View style={styles.screen}>
