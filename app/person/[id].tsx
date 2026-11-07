@@ -1,11 +1,11 @@
 import { useCallback, useState } from "react";
 import { Alert, FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
-import { colors, radius, spacing } from "../constants/theme";
-import { getEntriesForPerson, getPerson, settleUp } from "../lib/db";
-import { balanceLabel, formatMoney, prettyDate } from "../lib/format";
-import { shareReminder, shareSummary } from "../lib/share";
-import type { Entry, PersonWithBalance } from "../lib/types";
+import { colors, radius, spacing } from "../../constants/theme";
+import { getEntriesForPerson, getPerson, settleUp } from "../../lib/db";
+import { balanceLabel, formatMoney, prettyDate } from "../../lib/format";
+import { shareReminder, shareSummary } from "../../lib/share";
+import type { Entry, PersonWithBalance } from "../../lib/types";
 
 export default function PersonScreen() {
   const router = useRouter();
