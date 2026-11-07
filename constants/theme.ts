@@ -1,30 +1,36 @@
-// Warm, paper-notebook feel. Not a cold banking app.
-// These colours were picked to feel like a real diary page,
-// not a fintech dashboard.
+// LenaDena design system: dark, calm, professional.
+// One brand colour (gold), one green for money coming back,
+// one warm red for money to give back. Everything else is
+// quiet charcoal and warm white so the numbers stand out.
 
 export const colors = {
-  bg: "#FAF6F0",
-  card: "#FFFFFF",
-  ink: "#211D19",
-  muted: "#7D7468",
-  line: "#EAE2D6",
-  accent: "#D97706", // warm mustard, used sparingly
-  accentSoft: "#FEF3C7",
-  owesYou: "#1E7A4C",
-  owesYouSoft: "#E6F4EC",
-  youOwe: "#C2410C",
-  youOweSoft: "#FDECE3",
-  settled: "#6B7280",
-  settledSoft: "#F1EFEA",
+  bg: "#0B0C0E",
+  surface: "#15171B",
+  surface2: "#1D2025",
+  line: "#26292F",
+  ink: "#F4F1EA",
+  muted: "#A39E93",
+  faint: "#6E6A61",
+
+  gold: "#E8B33D",
+  goldDark: "#141005",
+  goldSoft: "#2A2210",
+
+  green: "#43B968",
+  greenSoft: "#122419",
+  red: "#E0654A",
+  redSoft: "#2A1710",
+  settled: "#8B877C",
+  settledSoft: "#1D2025",
 };
 
 export const radius = {
-  card: 18,
+  card: 20,
   button: 14,
   pill: 999,
 };
 
 export const spacing = {
-  page: 18,
+  page: 20,
   gap: 12,
 };
