@@ -38,7 +38,7 @@ Navigation is kept loose on purpose. You can start from anywhere:
 - React Native with Expo. I preview live on my Android phone with Expo Go, no heavy setup
 - expo-router for screens (feels like Next.js, which is my day job world)
 - expo-sqlite for the database on the phone itself (two tables: `people`, `entries`)
-- Plain StyleSheet styling with a warm paper-notebook theme, close to Tailwind habits
+- Dark professional UI with a custom two-arrow logo (give and take), Lucide icons, plain StyleSheet styling
 - EAS Build when it is time to ship to the Play Store
 
 ## Run it on your phone

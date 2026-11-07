@@ -3,13 +3,14 @@ import {
   Alert, FlatList, Pressable, StyleSheet, Text, TextInput, View,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { ArrowDownLeft, ArrowUpRight } from "lucide-react-native";
 import { colors, radius, spacing } from "../constants/theme";
 import { addEntry, getPeopleWithBalances } from "../lib/db";
 import { todayISO } from "../lib/format";
 
-// This screen is reachable from everywhere: home FAB, a person
+// This screen is reachable from everywhere: home button, a person
 // page, the next-step card. If no person is picked yet, it shows
-// a simple picker first — the user is never stuck.
+// a simple picker first, so the user is never stuck.
 export default function AddEntryScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ personId?: string }>();
@@ -56,7 +57,7 @@ export default function AddEntryScreen() {
           style={styles.saveBtn}
           onPress={() => router.replace("/add-person")}
         >
-          <Text style={styles.saveText}>Add a person first →</Text>
+          <Text style={styles.saveText}>Add a person first</Text>
         </Pressable>
       </View>
     );
@@ -64,11 +65,11 @@ export default function AddEntryScreen() {
 
   return (
     <View style={styles.screen}>
-      <Text style={styles.label}>Who is this for?</Text>
+      <Text style={styles.label}>WHO IS THIS FOR?</Text>
       {person ? (
         <Pressable style={styles.picked} onPress={() => setPersonId(null)}>
           <Text style={styles.pickedText}>{person.name}</Text>
-          <Text style={styles.changeText}>change</Text>
+          <Text style={styles.changeText}>Change</Text>
         </Pressable>
       ) : (
         <FlatList
@@ -83,54 +84,60 @@ export default function AddEntryScreen() {
         />
       )}
 
-      <Text style={styles.label}>What happened?</Text>
+      <Text style={styles.label}>WHAT HAPPENED?</Text>
       <View style={styles.toggleRow}>
         <Pressable
           style={[styles.toggle, kind === "gave" && styles.toggleGave]}
           onPress={() => setKind("gave")}
         >
-          <Text style={[styles.toggleText, kind === "gave" && styles.toggleTextOn]}>
-            I gave ↙
-          </Text>
-          <Text style={styles.toggleSub}>they owe me</Text>
+          <ArrowUpRight
+            size={22}
+            color={kind === "gave" ? colors.green : colors.muted}
+            strokeWidth={2.4}
+          />
+          <Text style={styles.toggleText}>I gave</Text>
+          <Text style={styles.toggleSub}>They owe me</Text>
         </Pressable>
         <Pressable
           style={[styles.toggle, kind === "took" && styles.toggleTook]}
           onPress={() => setKind("took")}
         >
-          <Text style={[styles.toggleText, kind === "took" && styles.toggleTextOn]}>
-            I took ↙
-          </Text>
+          <ArrowDownLeft
+            size={22}
+            color={kind === "took" ? colors.red : colors.muted}
+            strokeWidth={2.4}
+          />
+          <Text style={styles.toggleText}>I took</Text>
           <Text style={styles.toggleSub}>I owe them</Text>
         </Pressable>
       </View>
 
-      <Text style={styles.label}>Amount (Rs) *</Text>
+      <Text style={styles.label}>AMOUNT (RS)</Text>
       <TextInput
         style={styles.amountInput}
         placeholder="2000"
-        placeholderTextColor={colors.muted}
+        placeholderTextColor={colors.faint}
         value={amount}
         onChangeText={setAmount}
         keyboardType="numeric"
       />
 
-      <Text style={styles.label}>Note (optional)</Text>
+      <Text style={styles.label}>NOTE (OPTIONAL)</Text>
       <TextInput
         style={styles.input}
         placeholder="For petrol, till salary, lunch..."
-        placeholderTextColor={colors.muted}
+        placeholderTextColor={colors.faint}
         value={note}
         onChangeText={setNote}
       />
 
-      <Text style={styles.label}>Date</Text>
+      <Text style={styles.label}>DATE</Text>
       <TextInput
         style={styles.input}
         value={date}
         onChangeText={setDate}
         placeholder="2026-11-08"
-        placeholderTextColor={colors.muted}
+        placeholderTextColor={colors.faint}
       />
 
       <Pressable style={styles.saveBtn} onPress={save}>
@@ -146,41 +153,41 @@ export default function AddEntryScreen() {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.bg, padding: spacing.page },
   hint: { fontSize: 14, color: colors.muted, lineHeight: 20 },
-  label: { fontSize: 13, fontWeight: "700", color: colors.ink, marginTop: 16, marginBottom: 7 },
-  picker: { maxHeight: 180, backgroundColor: colors.card, borderRadius: radius.button, borderWidth: 1, borderColor: colors.line },
+  label: { fontSize: 11, fontWeight: "700", letterSpacing: 1.1, color: colors.muted, marginTop: 18, marginBottom: 7 },
+  picker: { maxHeight: 180, backgroundColor: colors.surface, borderRadius: radius.button, borderWidth: 1, borderColor: colors.line },
   pickerRow: { paddingHorizontal: 14, paddingVertical: 13, borderBottomWidth: 1, borderBottomColor: colors.line },
   pickerName: { fontSize: 15, color: colors.ink, fontWeight: "600" },
   picked: {
     flexDirection: "row", justifyContent: "space-between", alignItems: "center",
-    backgroundColor: colors.accentSoft, borderRadius: radius.button, padding: 14,
+    backgroundColor: colors.goldSoft, borderRadius: radius.button, padding: 14,
+    borderWidth: 1, borderColor: "#3A2F16",
   },
   pickedText: { fontSize: 16, fontWeight: "700", color: colors.ink },
-  changeText: { fontSize: 13, fontWeight: "700", color: colors.accent },
+  changeText: { fontSize: 13, fontWeight: "700", color: colors.gold },
   toggleRow: { flexDirection: "row", gap: 10 },
   toggle: {
-    flex: 1, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.line,
-    borderRadius: radius.button, padding: 14,
+    flex: 1, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.line,
+    borderRadius: radius.button, padding: 14, gap: 4,
   },
-  toggleGave: { backgroundColor: colors.owesYouSoft, borderColor: colors.owesYou },
-  toggleTook: { backgroundColor: colors.youOweSoft, borderColor: colors.youOwe },
-  toggleText: { fontSize: 16, fontWeight: "700", color: colors.ink },
-  toggleTextOn: { color: colors.ink },
-  toggleSub: { fontSize: 12, color: colors.muted, marginTop: 3 },
+  toggleGave: { backgroundColor: colors.greenSoft, borderColor: colors.green },
+  toggleTook: { backgroundColor: colors.redSoft, borderColor: colors.red },
+  toggleText: { fontSize: 16, fontWeight: "700", color: colors.ink, marginTop: 4 },
+  toggleSub: { fontSize: 12, color: colors.muted },
   amountInput: {
-    backgroundColor: colors.card, borderWidth: 1, borderColor: colors.line,
+    backgroundColor: colors.surface2, borderWidth: 1, borderColor: colors.line,
     borderRadius: radius.button, paddingHorizontal: 14, paddingVertical: 13,
-    fontSize: 22, fontWeight: "700", color: colors.ink,
+    fontSize: 24, fontWeight: "800", color: colors.ink,
   },
   input: {
-    backgroundColor: colors.card, borderWidth: 1, borderColor: colors.line,
+    backgroundColor: colors.surface2, borderWidth: 1, borderColor: colors.line,
     borderRadius: radius.button, paddingHorizontal: 14, paddingVertical: 13,
     fontSize: 16, color: colors.ink,
   },
   saveBtn: {
-    backgroundColor: colors.ink, borderRadius: radius.button,
-    paddingVertical: 15, alignItems: "center", marginTop: 26,
+    backgroundColor: colors.gold, borderRadius: radius.button,
+    paddingVertical: 15, alignItems: "center", marginTop: 28,
   },
-  saveText: { color: "#fff", fontWeight: "700", fontSize: 15 },
+  saveText: { color: colors.goldDark, fontWeight: "800", fontSize: 15 },
   cancelBtn: { alignItems: "center", paddingVertical: 14 },
   cancelText: { color: colors.muted, fontWeight: "600" },
 });

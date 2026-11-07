@@ -5,8 +5,8 @@ import { initDb } from "../lib/db";
 import { colors } from "../constants/theme";
 
 // One stack for the whole app. Add-person and add-entry open as
-// sheets (modal) so the user never feels "lost" — one swipe/back
-// and they are home again. Person detail pushes in normally.
+// sheets (modal) so the user never feels lost. One back tap and
+// they are home again. Person detail pushes in normally.
 export default function RootLayout() {
   useEffect(() => {
     initDb();
@@ -14,7 +14,7 @@ export default function RootLayout() {
 
   return (
     <>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
       <Stack
         screenOptions={{
           headerStyle: { backgroundColor: colors.bg },
@@ -24,7 +24,7 @@ export default function RootLayout() {
           contentStyle: { backgroundColor: colors.bg },
         }}
       >
-        <Stack.Screen name="index" options={{ title: "LenaDena" }} />
+        <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen
           name="add-person"
           options={{ title: "Add a person", presentation: "modal" }}

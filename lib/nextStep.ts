@@ -10,7 +10,7 @@ export type NextStep = {
 };
 
 // The brain of the home screen. LenaDena looks at where you are
-// and suggests the ONE thing that makes sense next — so a new
+// and suggests the ONE thing that makes sense next, so a new
 // user never stares at an empty app wondering what to press.
 //
 // Order matters: first match wins.
@@ -23,7 +23,7 @@ export function getNextStep(
   if (people.length === 0) {
     return {
       title: "Start with one person",
-      body: "Who did you last lend money to, or borrow from? Add them first — everything else follows from there.",
+      body: "Who did you last lend money to, or borrow from? Add them first. Everything else follows from there.",
       cta: "Add your first person",
       href: "/add-person",
     };
@@ -59,7 +59,7 @@ export function getNextStep(
     };
   }
 
-  // 4. An old open balance — the gentle reminder case.
+  // 4. An old open balance, the gentle reminder case.
   if (oldestOpen) {
     const days = Math.floor(
       (Date.now() - new Date(oldestOpen.entryDate + "T00:00:00").getTime()) / 86400000
@@ -69,7 +69,7 @@ export function getNextStep(
       return {
         title: `The balance with ${firstName(oldestOpen.personName)} is getting old`,
         body: `Open since ${ageText(oldestOpen.entryDate)}${
-          person ? ` — ${formatMoney(person.balance)} still open` : ""
+          person ? `: ${formatMoney(person.balance)} still open` : ""
         }. A soft reminder now is easier than a hard one later.`,
         cta: "Open and share a reminder",
         href: `/person/${oldestOpen.personId}`,

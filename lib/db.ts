@@ -2,10 +2,10 @@ import * as SQLite from "expo-sqlite";
 import type { Entry, EntryKind, PersonWithBalance } from "./types";
 
 // Everything lives in one small file on the phone: lenadena.db
-// No account, no server. Delete the app, the data is gone —
+// No account, no server. Delete the app, the data is gone.
 // that privacy is the whole point of LenaDena.
 //
-// The database opens LAZILY, on the first real query — never when
+// The database opens LAZILY, on the first real query, never when
 // this file is merely loaded. Startup can therefore never hang or
 // crash on database work, and by the time any screen asks for
 // data, the tables are guaranteed to exist (getDb creates them
