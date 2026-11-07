@@ -1,0 +1,1 @@
+{"expo":{"android":{"adaptiveIcon":{"backgroundColor":"#FAF6F0"},"package":"com.bilalkhan.lenadena"},"experiments":{"typedRoutes":true},"name":"LenaDena","newArchEnabled":true,"orientation":"portrait","plugins":["expo-router","expo-sqlite"],"scheme":"lenadena","slug":"lenadena","userInterfaceStyle":"light","version":"0.1.0"}}
